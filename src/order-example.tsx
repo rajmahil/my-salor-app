@@ -2,7 +2,7 @@ import { actions, useAppBridge } from "@saleor/app-sdk/app-bridge";
 import { Box, Text } from "@saleor/macaw-ui";
 import Link from "next/link";
 
-import { useLastOrderQuery } from "@/generated/graphql";
+import { useLastOrderQuery, useProductTimestampsQuery } from "@/generated/graphql";
 
 /**
  * GraphQL Code Generator scans for gql tags and generates types based on them.
@@ -27,6 +27,7 @@ export const OrderExample = () => {
 
   // Using the generated hook
   const [{ data, fetching }] = useLastOrderQuery();
+
   const lastOrder = data?.orders?.edges[0]?.node;
 
   const navigateToOrder = (id: string) => {

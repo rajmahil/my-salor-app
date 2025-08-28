@@ -19,43 +19,51 @@ export default createManifestHandler({
      */
     const iframeBaseUrl = process.env.APP_IFRAME_BASE_URL ?? appBaseUrl;
     const apiBaseURL = process.env.APP_API_BASE_URL ?? appBaseUrl;
+    const BASE = process.env.APP_URL || "https://31c9a1734314.ngrok-free.app";
 
     const extensionsForSaleor3_22: AppExtension[] = [
-        {
-          url: apiBaseURL + "/api/server-widget",
-          permissions: [],
-          mount: "PRODUCT_DETAILS_WIDGETS",
-          label: "Product Timestamps",
-          target: "WIDGET",
-          options: {
-            widgetTarget: {
-              method: "POST",
-            },
-          },
-        },
-        {
-          url: iframeBaseUrl+"/client-widget",
-          permissions: [],
-          mount: "ORDER_DETAILS_WIDGETS",
-          label: "Order widget example",
-          target: "WIDGET",
-          options: {
-            widgetTarget: {
-              method: "GET",
-            },
-          },
-        },
-      ]
+      {
+        url: "/api/server-widget",
+        permissions: [],
+        mount: "PRODUCT_OVERVIEW_CREATE",
+        label: "Product Timestamps",
+        target: "POPUP",
+        // options: {
+        //   widgetTarget: {
+        //     method: "POST",
+        //   },
+        // },
+      },
+      {
+        url: "/client-widget",
+        permissions: [],
+        mount: "PRODUCT_OVERVIEW_CREATE",
+        label: "Order widget example",
+        target: "POPUP",
+        // options: {
+        //   widgetTarget: {
+        //     method: "GET",
+        //   },
+        // },
+      },
+      {
+        label: "Sanity Product Sync",
+        mount: "PRODUCT_DETAILS_MORE_ACTIONS",
+        target: "POPUP",
+        permissions: ["MANAGE_PRODUCTS"],
+        url: "/widgets/product",
+      },
+    ];
 
     const saleorMajor = schemaVersion && schemaVersion[0];
-    const saleorMinor = schemaVersion && schemaVersion[1]
+    const saleorMinor = schemaVersion && schemaVersion[1];
 
     const is3_22 = saleorMajor === 3 && saleorMinor === 22;
 
     const extensions = is3_22 ? extensionsForSaleor3_22 : [];
 
     const manifest: AppManifest = {
-      name: "Saleor App Template",
+      name: "Sanity Sync",
       tokenTargetUrl: `${apiBaseURL}/api/register`,
       appUrl: iframeBaseUrl,
       /**
@@ -69,6 +77,8 @@ export default createManifestHandler({
          * This can be removed
          */
         "MANAGE_ORDERS",
+        "MANAGE_SETTINGS", // needed for NAVIGATION_CONFIGURATION tab
+        "MANAGE_PRODUCTS", // if you also mount product widgets
       ],
       id: "saleor.app",
       version: packageJson.version,
@@ -88,8 +98,9 @@ export default createManifestHandler({
        * Optionally, extend Dashboard with custom UIs
        * https://docs.saleor.io/docs/3.x/developer/extending/apps/extending-dashboard-with-apps
        */
-      extensions: extensions,
-      author: "Saleor Commerce",
+      extensions: extensionsForSaleor3_22,
+
+      author: "306 Technologies",
       brand: {
         logo: {
           default: `${apiBaseURL}/logo.png`,
